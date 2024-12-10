@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Конвертер валют</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    form {
+      width: 400px;
+      margin: auto;
+      background: #d3f0fd;
+      padding: 20px;
+      border-radius: 5px;      
+    }
+    input, select {
+      display: block;
+      width: 95%;
+      margin: 10px 0;
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 5px; 
+    }
+    .readonly-input {
+      background-color: #e9ecef;
+      border: 1px solid #ced4da;
+      color: #495057;
+    }
+    button {
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      padding: 10px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+
+  <h1 style="text-align: center;">Конвертер валют</h1>
+  <form id="currencyForm">
+    <label>Введите сумму:</label>
+    <input type="number" id="amount" name="amount" placeholder="Введите количество" oninput="convertCurrency()" required>
+
+    <label>Выберите валюту:</label>
+    <select id="fromCurrency" name="fromCurrency" onchange="convertCurrency()" required>
+      <option value="USD">USD (Dollar)</option>
+      <option value="EUR">EUR (Euro)</option>
+      <option value="KZT">KZT (Tenge)</option>
+    </select>
+
+    <label>USD (Dollar):</label>
+    <input type="text" id="toUSD" class="readonly-input" readonly>
+
+    <label>EUR (Euro):</label>
+    <input type="text" id="toEUR" class="readonly-input" readonly>
+
+    <label>KZT (Tenge):</label>
+    <input type="text" id="toKZT" class="readonly-input" readonly>
+  </form>
+
+  <script>
+    // Курсы валют с учетом покупки и продажи
+    const exchangeRates = {
+      USD: { buy: 429, sell: 431 },
+      EUR: { buy: 507, sell: 509 },
+      KZT: { buy: 1, sell: 1 }
+    };
+
+    // Функция для конвертации валют
+    function convertCurrency() {
+      const amount = parseFloat(document.getElementById('amount').value);
+      const fromCurrency = document.getElementById('fromCurrency').value;
+
+      if (isNaN(amount) || amount <= 0) {
+        document.getElementById('toUSD').value = '';
+        document.getElementById('toEUR').value = '';
+        document.getElementById('toKZT').value = '';
+        return;
+      }
+
+      // Конвертация в зависимости от типа валюты
+      let toUSD, toEUR, toKZT;
+
+      if (fromCurrency === 'USD') {
+        toUSD = amount.toFixed(2);
+        toEUR = (amount * exchangeRates.USD.sell / exchangeRates.EUR.buy).toFixed(2);
+        toKZT = (amount * exchangeRates.USD.sell).toFixed(2);
+      } else if (fromCurrency === 'EUR') {
+        toUSD = (amount * exchangeRates.EUR.sell / exchangeRates.USD.buy).toFixed(2);
+        toEUR = amount.toFixed(2);
+        toKZT = (amount * exchangeRates.EUR.sell).toFixed(2);
+      } else if (fromCurrency === 'KZT') {
+        toUSD = (amount / exchangeRates.USD.buy).toFixed(2);
+        toEUR = (amount / exchangeRates.EUR.buy).toFixed(2);
+        toKZT = amount.toFixed(2);
+      }
+
+      // Обновление значений в полях
+      document.getElementById('toUSD').value = `${toUSD} USD`;
+      document.getElementById('toEUR').value = `${toEUR} EUR`;
+      document.getElementById('toKZT').value = `${toKZT} KZT`;
+    }
+  </script>
+
+</body>
+</html>
